@@ -1,0 +1,39 @@
+Name: “CodeQL Analysis”
+
+On:
+  Push:
+    Branches: [ “main” ]
+  Pull_request:
+    Branches: [ “main” ]
+  Schedule:
+    - cron: ‘0 18 * * 0’
+
+Jobs:
+  Analyze:
+    Name: Analyze
+    Runs-on: ubuntu-latest
+    Permissions:
+      Actions: read
+      Contents: read
+      Security-events: write
+
+    Strategy:
+      Fail-fast: false
+      Matrix:
+        Language: [ ‘javascript’, ‘python’ ]  # altere conforme o tipo do seu projeto
+
+    Steps:
+      - name: Checkout repository
+        Uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        Uses: github/codeql-action/init@v3
+        With:
+          Languages: ${{ matrix.language }}
+
+      - name: Perform CodeQL Analysis
+        Uses: github/codeql-action/analyze@v3
+        With:
+          Category: “/language:${{matrix.language}}”
+
+
